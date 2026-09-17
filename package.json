@@ -7,10 +7,12 @@
   "author": "local",
   "repository": {
     "type": "git",
-    "url": "file:///home/yanghao05/Workspace/pi-push"
+    "url": "https://git.ipao.vip/rogee/pi-ntfy"
   },
-  "bugs": {},
-  "homepage": "file:///home/yanghao05/Workspace/pi-push",
+  "bugs": {
+    "url": "https://git.ipao.vip/rogee/pi-ntfy/issues"
+  },
+  "homepage": "https://git.ipao.vip/rogee/pi-ntfy",
   "keywords": [
     "pi",
     "pi-coding-agent",
