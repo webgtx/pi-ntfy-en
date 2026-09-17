@@ -57,6 +57,15 @@ pi remove npm:pi-ntfy
 
 `token` 可以使用 `$NTFY_TOKEN` 或 `${NTFY_TOKEN}` 引用环境变量；配置文件路径本身不受环境变量影响。
 
+配置字段：
+
+```json
+{
+  "titleTemplate": "[{{project}}] {{status}} · {{session}}",
+  "template": "项目: {{project}}\\n会话: {{session}}\\n任务: {{task}}\\n状态: {{status}}\\n原因: {{reason}}\\n摘要: {{summary}}\\n耗时: {{duration}}\\n模型: {{model}}\\n主机: {{host}}\\n时间: {{date}} {{time}}\\n工具: {{tools}}"
+}
+```
+
 支持的占位符：
 
 ```text
