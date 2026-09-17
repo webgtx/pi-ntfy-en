@@ -35,10 +35,6 @@
     "LICENSE",
     "DESIGN.md"
   ],
-  "scripts": {
-    "test": "node test/run.ts",
-    "prepublishOnly": "node test/run.ts"
-  },
   "peerDependencies": {
     "@earendil-works/pi-coding-agent": "*"
   },
