@@ -1,0 +1,54 @@
+{
+  "name": "pi-ntfy",
+  "version": "1.0.0",
+  "description": "Project and session-aware NTFY notifications for the pi coding agent.",
+  "type": "module",
+  "license": "MIT",
+  "author": "local",
+  "repository": {
+    "type": "git",
+    "url": "file:///home/yanghao05/Workspace/pi-push"
+  },
+  "bugs": {},
+  "homepage": "file:///home/yanghao05/Workspace/pi-push",
+  "keywords": [
+    "pi",
+    "pi-coding-agent",
+    "pi-package",
+    "pi-extension",
+    "ntfy",
+    "notify"
+  ],
+  "files": [
+    "channels",
+    "index.ts",
+    "command.ts",
+    "config.ts",
+    "http.ts",
+    "notifier.ts",
+    "render.ts",
+    "types.ts",
+    "config.example.json",
+    "README.md",
+    "LICENSE",
+    "DESIGN.md"
+  ],
+  "scripts": {
+    "test": "node test/run.ts",
+    "prepublishOnly": "node test/run.ts"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}
