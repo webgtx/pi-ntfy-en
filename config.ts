@@ -11,7 +11,7 @@ import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import type { ChannelConfig, NotifyConfig, NtfyChannel } from "./types.ts";
 
-const CONFIG_PATH = join(homedir(), ".pi", "agents", "pi-ntfy.json");
+const CONFIG_PATH = join(homedir(), ".pi", "agent", "pi-ntfy.json");
 
 export function configPath(): string {
 	return CONFIG_PATH;

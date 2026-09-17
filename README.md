@@ -29,7 +29,7 @@ pi remove npm:pi-ntfy
 插件固定从以下路径读取配置，不再通过环境变量选择配置文件：
 
 ```text
-~/.pi/agents/pi-ntfy.json
+~/.pi/agent/pi-ntfy.json
 ```
 
 如果文件不存在，插件保持静默；可直接创建该文件，或使用 `/ntfy set`、`/ntfy enable` 等命令生成和修改配置。
