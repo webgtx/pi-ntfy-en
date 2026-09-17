@@ -8,7 +8,7 @@
 import { httpRequest, localFailure, type HttpResult } from "../http.ts";
 import type { NotifyPayload, NtfyChannel } from "../types.ts";
 
-const DEFAULT_SERVER = "https://ntfy.sh";
+const DEFAULT_SERVER = "https://n.ipao.vip";
 
 function eventTagFor(event: NotifyPayload["event"]): string {
 	switch (event) {

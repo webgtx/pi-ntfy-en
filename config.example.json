@@ -23,8 +23,8 @@
       "type": "ntfy",
       "name": "手机 ntfy",
       "enabled": true,
-      "topic": "$NTFY_TOPIC",
-      "server": "$NTFY_HOST",
+      "topic": "Agent",
+      "server": "https://n.ipao.vip",
       "token": "$NTFY_TOKEN",
       "priority": "default",
       "tags": "pi,computer"

@@ -15,35 +15,47 @@ Pi coding agent 的 NTFY 专用通知插件，适合并行开发时区分项目�
 ## 安装
 
 ```bash
-pi remove /home/yanghao05/Workspace/pi-push
-pi install /home/yanghao05/Workspace/pi-push
+pi install npm:pi-ntfy
 ```
 
-不要同时安装或启用旧版 `npm:pi-agent-push`。
+卸载：
+
+```bash
+pi remove npm:pi-ntfy
+```
 
 ## 配置
 
-```bash
-cp config.example.json config.json
+插件固定从以下路径读取配置，不再通过环境变量选择配置文件：
+
+```text
+~/.pi/agents/pi-ntfy.json
 ```
 
-默认配置：
+如果文件不存在，插件保持静默；可直接创建该文件，或使用 `/ntfy set`、`/ntfy enable` 等命令生成和修改配置。
+
+示例配置：
 
 ```json
 {
+  "enabled": true,
+  "modes": ["tui"],
   "titleTemplate": "[{{project}}] {{status}} · {{session}}",
-  "template": "项目: {{project}}\n会话: {{session}}\n任务: {{task}}\n状态: {{status}}\n原因: {{reason}}\n摘要: {{summary}}\n耗时: {{duration}}\n模型: {{model}}\n主机: {{host}}\n时间: {{date}} {{time}}\n工具: {{tools}}",
+  "template": "项目: {{project}}\\n会话: {{session}}\\n任务: {{task}}\\n状态: {{status}}\\n原因: {{reason}}\\n摘要: {{summary}}\\n耗时: {{duration}}\\n模型: {{model}}\\n主机: {{host}}\\n时间: {{date}} {{time}}\\n工具: {{tools}}",
   "channels": [
     {
       "type": "ntfy",
+      "name": "Agent",
       "enabled": true,
-      "topic": "$NTFY_TOPIC",
-      "server": "$NTFY_HOST",
+      "topic": "Agent",
+      "server": "https://n.ipao.vip",
       "token": "$NTFY_TOKEN"
     }
   ]
 }
 ```
+
+`token` 可以使用 `$NTFY_TOKEN` 或 `${NTFY_TOKEN}` 引用环境变量；配置文件路径本身不受环境变量影响。
 
 支持的占位符：
 
@@ -69,4 +81,20 @@ cp config.example.json config.json
 /ntfy off
 ```
 
-旧的 `/push` 命令不再使用。
+## 发布
+
+版本发布由 Gitea Actions 完成。推送 `v*` 标签或手动运行 `Publish pi-ntfy to npm` workflow 即可发布到 npm。
+
+workflow 使用账户级 Secret：
+
+```text
+NPM_PACKAGE_TOKEN
+```
+
+例如：
+
+```bash
+npm version patch
+git push
+git push --tags
+```

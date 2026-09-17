@@ -9,35 +9,21 @@ import {
 } from "node:fs";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { ChannelConfig, NotifyConfig, NtfyChannel } from "./types.ts";
 
-function resolveExtensionDir(): string {
-	try {
-		return dirname(fileURLToPath(import.meta.url));
-	} catch {
-		return join(homedir(), ".pi", "agent", "extensions", "pi-ntfy");
-	}
-}
-
-export const EXTENSION_DIR = resolveExtensionDir();
+const CONFIG_PATH = join(homedir(), ".pi", "agents", "pi-ntfy.json");
 
 export function configPath(): string {
-	const override =
-		process.env.PI_NTFY_CONFIG?.trim() ||
-		process.env.PI_AGENT_PUSH_CONFIG?.trim() ||
-		process.env.PI_PUSH_CONFIG?.trim();
-	return override ? override : join(EXTENSION_DIR, "config.json");
+	return CONFIG_PATH;
 }
 
 export function logPath(): string {
-	// Next to the config file, so PI_AGENT_PUSH_CONFIG keeps everything together.
-	return join(dirname(configPath()), "push.log");
+	return join(dirname(configPath()), "pi-ntfy.log");
 }
 
 export const KNOWN_TYPES = ["ntfy"] as const;
 export type KnownChannelType = (typeof KNOWN_TYPES)[number];
-/** Whole-value reference: "$BARK_KEY" */
+/** Whole-value reference: "$NTFY_TOKEN" */
 const ENV_REF = /^\$([A-Za-z_][A-Za-z0-9_]*)$/;
 /** Embedded reference: "Bearer ${MY_TOKEN}" */
 const ENV_INTERPOLATION = /\$\{([A-Za-z_][A-Za-z0-9_]*)\}/g;

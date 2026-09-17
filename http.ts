@@ -1,10 +1,4 @@
-/**
- * pi-agent-push — HTTP transport.
- *
- * Every request carries its own `AbortSignal.timeout`. It must never use the
- * agent's `ctx.signal`: on the "interrupted" path that signal is already
- * aborted, so the notification about the cancellation would cancel itself.
- */
+/** pi-ntfy HTTP transport. */
 
 import type { ChannelResult } from "./types.ts";
 

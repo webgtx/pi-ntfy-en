@@ -1,11 +1,4 @@
-/**
- * pi-agent-push — `{{placeholder}}` substitution.
- *
- * Escaping matters: a raw string template that lands inside JSON must have its
- * values JSON-escaped, otherwise a quote or newline in an error message
- * produces an invalid request body. Object templates avoid the problem
- * entirely (substitute first, stringify after) and are the recommended form.
- */
+/** pi-ntfy template rendering. */
 
 const PLACEHOLDER = /\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g;
 
