@@ -25,14 +25,6 @@ function eventTagFor(event: NotifyPayload["event"]): string {
 	}
 }
 
-function isAscii(value: string): boolean {
-	return [...value].every((char) => char.charCodeAt(0) <= 255);
-}
-
-function base64(value: string): string {
-	return Buffer.from(value, "utf8").toString("base64url");
-}
-
 function addErrorDetail(result: HttpResult): HttpResult {
 	if (result.ok) return result;
 	let detail = result.error ?? `HTTP ${result.status}`;
@@ -66,44 +58,29 @@ export async function sendNtfy(
 			: `Bearer ${token}`;
 	}
 
-	const project = payload.vars.project ?? "";
-	const session = payload.vars.session ?? "";
-	const task = payload.vars.task ?? "";
-	const asciiSession = isAscii(session) ? session : "";
-	const asciiTitle = isAscii(payload.title)
-		? payload.title
-		: `[${project || "pi"}] pi ${payload.event}${asciiSession ? ` · ${asciiSession}` : ""}`;
-
-	// NTFY headers must be ASCII-safe under Node's fetch implementation.
-	headers.Title = asciiTitle;
-	headers["X-Event"] = payload.event;
-	if (isAscii(project)) headers["X-Project"] = project;
-	if (asciiSession) headers["X-Session"] = asciiSession;
-	if (isAscii(task) && task) headers["X-Task"] = task;
-	if (project) headers["X-Project-B64"] = base64(project);
-	if (session) headers["X-Session-B64"] = base64(session);
-	if (task) headers["X-Task-B64"] = base64(task);
-
-	if (channel.priority != null && channel.priority !== "") {
-		headers.Priority = String(channel.priority);
-	}
+	// Publish as JSON (POST to the server root): title/message travel in a UTF-8
+	// body, so Chinese titles work — plain-text publishing would force headers to
+	// be Latin-1 (fetch ByteString) and we had to mangle non-ASCII titles.
 	const configuredTags =
 		channel.tags == null
-			? ""
+			? []
 			: Array.isArray(channel.tags)
-				? channel.tags.join(",")
-				: String(channel.tags);
-	const tags = [configuredTags, eventTagFor(payload.event)]
-		.filter(Boolean)
-		.join(",");
-	if (tags) headers.Tags = tags;
-	if (channel.clickUrl) headers.Click = channel.clickUrl;
-	if (channel.icon) headers.Icon = channel.icon;
-	if (channel.email) headers.Email = channel.email;
+				? channel.tags
+				: [String(channel.tags)];
+	const body = JSON.stringify({
+		topic,
+		title: payload.title,
+		message: payload.text,
+		tags: [...configuredTags, eventTagFor(payload.event)],
+		...(channel.priority != null && channel.priority !== "" && { priority: channel.priority }),
+		...(channel.clickUrl && { click: channel.clickUrl }),
+		...(channel.icon && { icon: channel.icon }),
+		...(channel.email && { email: channel.email }),
+	});
 
 	const result = await httpRequest(
-		`${server}/${encodeURIComponent(topic)}`,
-		{ method: "POST", headers, body: payload.text },
+		server,
+		{ method: "POST", headers, body },
 		timeoutMs,
 	);
 	return addErrorDetail(result);

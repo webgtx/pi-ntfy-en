@@ -41,4 +41,4 @@
 
 本插件只有一个通道：`ntfy`。其他推送通道和对应实现已移除。
 
-NTFY 元数据使用 `Title`、`Tags`、`X-Project`、`X-Session`、`X-Event`、`X-Task` headers。含中文的字段会写入 Base64 版本的 headers，完整中文内容始终保留在正文中。
+NTFY 采用 JSON 发布（POST 到 server 根路径）：`title`、`message` 随 UTF-8 JSON body 传输，中文标题/正文不受 HTTP header 只允许 Latin-1 的限制；`tags`/`priority`/`click`/`icon`/`email` 同样走 JSON 字段。
