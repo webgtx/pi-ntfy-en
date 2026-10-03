@@ -1,7 +1,7 @@
 {
-  "name": "pi-ntfy",
-  "version": "1.0.3",
-  "description": "Project and session-aware NTFY notifications for the pi coding agent.",
+  "name": "pi-ntfy-en",
+  "version": "1.0.0",
+  "description": "Project and session-aware NTFY notifications for the pi coding agent (English UI, fork of pi-ntfy).",
   "type": "module",
   "license": "MIT",
   "author": "local",

@@ -1,44 +1,44 @@
-# pi-ntfy 设计说明
+# pi-ntfy-en Design Notes
 
-## 目标
+## Goal
 
-只通过 NTFY 推送 pi Agent 的状态，并让并行开发时可以区分项目、Session 和任务。
+Push pi agent status exclusively via NTFY, so parallel development sessions can be distinguished by project, session, and task.
 
-## 事件
+## Events
 
-- `agent_start`：记录开始时间和当前任务
-- `agent_end`：记录最终 assistant 摘要和停止原因
-- `agent_settled`：唯一的 idle/interrupted 推送点
-- `tool_execution_start`：记录本轮使用过的工具
-- `tool_call`：检测需要用户回答的工具
-- `session_shutdown`：按配置发送退出通知
+- `agent_start`: remember when the run started
+- `agent_end`: remember the terminal assistant summary and stop reason of this low-level run
+- `agent_settled`: the single idle/interrupted push point, after retries and compaction
+- `tool_execution_start`: record the tools used during the run
+- `tool_call`: detect tools that are waiting for a user answer
+- `session_shutdown`: send the exit notification when enabled
 
-## 内容
+## Content
 
-标题默认包含：
-
-```text
-[项目] 状态 · Session
-```
-
-正文默认每项独占一行：
+The title includes, by default:
 
 ```text
-项目
-会话
-任务
-状态
-原因
-摘要
-耗时
-模型
-主机
-时间
-工具
+[project] status · session
 ```
 
-## 通道
+The body includes, by default (one item per line):
 
-本插件只有一个通道：`ntfy`。其他推送通道和对应实现已移除。
+```text
+Project
+Session
+Task
+Status
+Reason
+Summary
+Duration
+Model
+Host
+Time
+Tools
+```
 
-NTFY 采用 JSON 发布（POST 到 server 根路径）：`title`、`message` 随 UTF-8 JSON body 传输，中文标题/正文不受 HTTP header 只允许 Latin-1 的限制；`tags`/`priority`/`click`/`icon`/`email` 同样走 JSON 字段。
+## Channel
+
+This plugin has a single channel: `ntfy`. Other push channels and their implementations have been removed.
+
+NTFY publishes as JSON (POST to the server root): `title`/`message` travel in the UTF-8 body, so non-ASCII titles and bodies are unaffected by the Latin-1-only HTTP header limitation. `tags`/`priority`/`click`/`icon`/`email` are likewise carried as JSON fields.

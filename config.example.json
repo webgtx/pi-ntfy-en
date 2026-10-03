@@ -1,6 +1,6 @@
 {
-  "_说明": "pi-ntfy 只支持 NTFY。复制为 config.json 后按需修改。",
-  "_占位符": "{{status}} {{reason}} {{text}} {{title}} {{event}} {{cwd}} {{project}} {{duration}} {{session}} {{sessionId}} {{model}} {{mode}} {{thinking}} {{task}} {{summary}} {{tools}} {{host}} {{time}} {{date}}",
+  "_note": "pi-ntfy-en only supports NTFY. Copy to ~/.pi/agent/pi-ntfy.json and adjust as needed.",
+  "_placeholders": "{{status}} {{reason}} {{text}} {{title}} {{event}} {{cwd}} {{project}} {{duration}} {{session}} {{sessionId}} {{model}} {{mode}} {{thinking}} {{task}} {{summary}} {{tools}} {{host}} {{time}} {{date}}",
   "enabled": true,
   "modes": ["tui"],
   "timeoutMs": 5000,
@@ -10,7 +10,7 @@
   "maxTextChars": 2000,
   "debug": false,
   "titleTemplate": "[{{project}}] {{status}} · {{session}}",
-  "template": "项目: {{project}}\n会话: {{session}}\n任务: {{task}}\n状态: {{status}}\n原因: {{reason}}\n摘要: {{summary}}\n耗时: {{duration}}\n模型: {{model}}\n主机: {{host}}\n时间: {{date}} {{time}}\n工具: {{tools}}",
+  "template": "Project: {{project}}\nSession: {{session}}\nTask: {{task}}\nStatus: {{status}}\nReason: {{reason}}\nSummary: {{summary}}\nDuration: {{duration}}\nModel: {{model}}\nHost: {{host}}\nTime: {{date}} {{time}}\nTools: {{tools}}",
   "events": {
     "idle": true,
     "interrupted": true,
@@ -21,10 +21,10 @@
   "channels": [
     {
       "type": "ntfy",
-      "name": "手机 ntfy",
+      "name": "Phone ntfy",
       "enabled": true,
       "topic": "Agent",
-      "server": "https://n.ipao.vip",
+      "server": "https://ntfy.sh",
       "token": "$NTFY_TOKEN",
       "priority": "default",
       "tags": "pi,computer"
