@@ -21,18 +21,18 @@ export interface CommandResult {
 
 function usage(): string {
 	return [
-		"用法:",
-		"  /ntfy                         状态",
-		"  /ntfy list                    查看 ntfy 配置",
-		"  /ntfy get                     查看配置（密钥脱敏）",
-		"  /ntfy enable|disable         开关 ntfy",
-		"  /ntfy set key=value ...       设置 topic/token/server 等",
-		"  /ntfy test                    发送测试通知",
-		"  /ntfy on | off                当前会话总开关",
-		"  /ntfy events [k=on|off…]      设置事件开关",
-		"  /ntfy help                   帮助",
+		"Usage:",
+		"  /ntfy                         status",
+		"  /ntfy list                    show ntfy channel",
+		"  /ntfy get                     show config (secrets masked)",
+		"  /ntfy enable|disable          toggle ntfy",
+		"  /ntfy set key=value ...       set topic/token/server etc.",
+		"  /ntfy test                    send a test notification",
+		"  /ntfy on | off                toggle for this session",
+		"  /ntfy events [k=on|off…]      set event toggles",
+		"  /ntfy help                    help",
 		"",
-		"示例:",
+		"Examples:",
 		"  /ntfy set topic=my-topic token=$NTFY_TOKEN enabled=true",
 		"  /ntfy test",
 	].join("\n");
@@ -58,7 +58,7 @@ function parseBool(raw: string): boolean {
 	const value = raw.trim().toLowerCase();
 	if (["1", "true", "on", "yes", "开", "启用"].includes(value)) return true;
 	if (["0", "false", "off", "no", "关", "禁用"].includes(value)) return false;
-	throw new Error(`无法解析布尔值: ${raw}（用 true/false 或 on/off）`);
+	throw new Error(`cannot parse boolean: ${raw} (use true/false or on/off)`);
 }
 
 function coerceField(key: string, raw: string): string | number | boolean {
@@ -91,16 +91,16 @@ function applyPairs(
 	const changed: string[] = [];
 	for (const pair of pairs) {
 		const separator = pair.indexOf("=");
-		if (separator <= 0) throw new Error(`参数应为 key=value，收到: ${pair}`);
+		if (separator <= 0) throw new Error(`expected key=value, got: ${pair}`);
 		const key = pair.slice(0, separator).trim();
 		if (!allowed.has(key))
 			throw new Error(
-				`ntfy 不支持字段 "${key}"。可设: ${[...allowed].join(", ")}`,
+				`ntfy does not support field "${key}". Settable: ${[...allowed].join(", ")}`,
 			);
 		channel[key] = coerceField(key, pair.slice(separator + 1));
 		changed.push(key);
 	}
-	if (changed.length === 0) throw new Error("请至少提供一个 key=value");
+	if (changed.length === 0) throw new Error("provide at least one key=value");
 	return changed;
 }
 
@@ -112,19 +112,19 @@ function describeConfig(
 ): string {
 	const channel = config.channels[0];
 	const lines = [
-		`pi-ntfy: ${runtimeEnabled && config.enabled ? "已启用" : "已停用"}${config.exists ? "" : "（无配置文件）"}`,
-		`配置: ${config.path}`,
-		`渠道: ${channel ? formatChannelLabel(channel, 0) : "ntfy（未配置）"}`,
-		`事件: ${(["idle", "interrupted", "needInput", "exit"] as const).map((key) => `${key}=${config.events[key] ? "on" : "off"}`).join(" ")}`,
-		`模式: ${config.modes.join(",")}`,
+		`pi-ntfy: ${runtimeEnabled && config.enabled ? "enabled" : "disabled"}${config.exists ? "" : " (no config file)"}`,
+		`Config: ${config.path}`,
+		`Channel: ${channel ? formatChannelLabel(channel, 0) : "ntfy (not configured)"}`,
+		`Events: ${(["idle", "interrupted", "needInput", "exit"] as const).map((key) => `${key}=${config.events[key] ? "on" : "off"}`).join(" ")}`,
+		`Modes: ${config.modes.join(",")}`,
 	];
 	if (last && describeResults)
 		lines.push(
-			`上次推送: ${new Date(last.at).toTimeString().slice(0, 8)} ${last.event} → ${describeResults(last.results)}`,
+			`Last push: ${new Date(last.at).toTimeString().slice(0, 8)} ${last.event} -> ${describeResults(last.results)}`,
 		);
-	else lines.push("上次推送: (无)");
+	else lines.push("Last push: (none)");
 	if (config.warnings.length > 0)
-		lines.push(`警告: ${config.warnings.join("; ")}`);
+		lines.push(`Warnings: ${config.warnings.join("; ")}`);
 	return lines.join("\n");
 }
 
@@ -158,14 +158,14 @@ export function handlePushCommand(
 		options.setRuntimeEnabled(action === "on");
 		return {
 			ok: true,
-			message: `pi-ntfy 已${action === "on" ? "开启" : "关闭"}（仅当前会话）`,
+			message: `pi-ntfy ${action === "on" ? "enabled" : "disabled"} for this session`,
 		};
 	}
 	if (action === "test") return { ok: true, message: "", runTest: true };
 	if (action === "list" || action === "get") {
 		const raw = loadRawConfig();
 		const channels = channelData(raw.data);
-		if (channels.length === 0) return { ok: true, message: "没有配置 ntfy" };
+		if (channels.length === 0) return { ok: true, message: "no ntfy channel configured" };
 		const channel = channels[0];
 		if (action === "list")
 			return {
@@ -189,7 +189,7 @@ export function handlePushCommand(
 		const path = saveRawConfig(raw.data);
 		return {
 			ok: true,
-			message: `ntfy 已${action === "enable" ? "开启" : "关闭"}\n已写入 ${path}`,
+			message: `ntfy ${action === "enable" ? "enabled" : "disabled"}\nwritten to ${path}`,
 		};
 	}
 	if (action === "set") {
@@ -199,7 +199,7 @@ export function handlePushCommand(
 		const path = saveRawConfig(raw.data);
 		return {
 			ok: true,
-			message: `已更新 ntfy: ${changed.map((key) => `${key}=${maskSecret(key, channelData(raw.data)[index][key])}`).join(" ")}\n已写入 ${path}`,
+			message: `updated ntfy: ${changed.map((key) => `${key}=${maskSecret(key, channelData(raw.data)[index][key])}`).join(" ")}\nwritten to ${path}`,
 		};
 	}
 	if (action === "events") {
@@ -212,9 +212,9 @@ export function handlePushCommand(
 		});
 		for (const pair of tokens.slice(1)) {
 			const separator = pair.indexOf("=");
-			if (separator <= 0) throw new Error(`参数应为 event=on|off，收到: ${pair}`);
+			if (separator <= 0) throw new Error(`expected event=on|off, got: ${pair}`);
 			const key = pair.slice(0, separator);
-			if (!(key in events)) throw new Error(`未知事件 "${key}"`);
+			if (!(key in events)) throw new Error(`unknown event "${key}"`);
 			events[key] = parseBool(pair.slice(separator + 1));
 		}
 		if (tokens.length > 1) saveRawConfig(raw.data);
@@ -225,7 +225,7 @@ export function handlePushCommand(
 				.join(" "),
 		};
 	}
-	return { ok: false, message: `未知子命令 "${action}"\n${usage()}` };
+	return { ok: false, message: `unknown subcommand "${action}"\n${usage()}` };
 }
 
 export function filterConfigToChannel(

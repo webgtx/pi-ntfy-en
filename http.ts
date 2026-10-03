@@ -95,5 +95,5 @@ export function applyApiStatus(
 	}
 	const verdict = pick(payload);
 	if (!verdict || verdict.ok) return result;
-	return { ...result, ok: false, error: verdict.message ?? "API 返回失败" };
+	return { ...result, ok: false, error: verdict.message ?? "API returned failure" };
 }

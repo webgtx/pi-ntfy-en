@@ -31,7 +31,7 @@ const CONTEXT_CHARS = 180;
 function compactText(value: string | undefined, max = CONTEXT_CHARS): string {
 	if (!value) return "";
 	const text = value
-		.replace(/```[\s\S]*?```/g, "[代码]")
+		.replace(/```[\s\S]*?```/g, "[code]")
 		.replace(/\s+/g, " ")
 		.trim();
 	return text.length > max ? `${text.slice(0, max - 1)}…` : text;
@@ -53,12 +53,12 @@ function assistantText(message: { content?: unknown }): string {
 }
 
 function describeResults(results: ChannelResult[]): string {
-	if (results.length === 0) return "没有匹配的渠道";
+	if (results.length === 0) return "no matching channels";
 	return results
 		.map((r) =>
 			r.ok
 				? `${r.channel} ok(${r.status}, ${r.ms}ms)`
-				: `${r.channel} 失败(${r.error ?? "unknown"})`,
+				: `${r.channel} failed(${r.error ?? "unknown"})`,
 		)
 		.join("; ");
 }
@@ -179,11 +179,11 @@ export default function piNtfy(pi: ExtensionAPI) {
 		if (stopReason === "aborted" || stopReason === "error") {
 			const reason =
 				stopReason === "aborted"
-					? "本轮被取消"
-					: `运行出错：${summarizeError(state?.errorMessage, ERROR_REASON_CHARS) || "未知错误"}`;
+					? "run was aborted"
+					: `run error: ${summarizeError(state?.errorMessage, ERROR_REASON_CHARS) || "unknown error"}`;
 			notifier.fire(config, {
 				event: "interrupted",
-				status: "已中断",
+				status: "interrupted",
 				reason,
 				durationMs,
 				...baseInput(ctx, state),
@@ -197,8 +197,8 @@ export default function piNtfy(pi: ExtensionAPI) {
 
 		notifier.fire(config, {
 			event: "idle",
-			status: "已就绪",
-			reason: "输出结束，等待输入",
+			status: "idle",
+			reason: "finished, waiting for input",
 			durationMs,
 			...baseInput(ctx, state),
 		});
@@ -210,8 +210,8 @@ export default function piNtfy(pi: ExtensionAPI) {
 		if (!config.needInputTools.includes(event.toolName)) return;
 		notifier.fire(config, {
 			event: "needInput",
-			status: "需要确认",
-			reason: "pi 正在等你回答问题",
+			status: "needs input",
+			reason: "pi is waiting for your answer",
 			durationMs: run ? Date.now() - run.startedAt : undefined,
 			...baseInput(ctx, run),
 		});
@@ -229,8 +229,8 @@ export default function piNtfy(pi: ExtensionAPI) {
 				config,
 				{
 					event: "exit",
-					status: "已退出",
-					reason: "会话结束",
+					status: "exited",
+					reason: "session ended",
 					...baseInput(ctx, run),
 				},
 				config.shutdownTimeoutMs,
@@ -271,7 +271,7 @@ export default function piNtfy(pi: ExtensionAPI) {
 				invalidateConfigCache();
 				let config = loadConfig();
 				if (!config.exists && config.channels.length === 0) {
-					ctx.ui.notify(`未找到配置文件：${config.path}`, "error");
+					ctx.ui.notify(`config file not found: ${config.path}`, "error");
 					return;
 				}
 				try {
@@ -289,17 +289,17 @@ export default function piNtfy(pi: ExtensionAPI) {
 					{ ...config, enabled: true },
 					{
 						event: "test",
-						status: "测试",
+						status: "test",
 						reason: result.testFilter
-							? `pi-ntfy 测试 (${result.testFilter})`
-							: "pi-ntfy 通道测试",
+							? `pi-ntfy test (${result.testFilter})`
+							: "pi-ntfy channel test",
 						durationMs: 0,
 						...baseInput(ctx, run),
 					},
 				);
 				const ok = results.length > 0 && results.every((r) => r.ok);
 				ctx.ui.notify(
-					`pi-ntfy 测试：${describeResults(results)}`,
+					`pi-ntfy test: ${describeResults(results)}`,
 					ok ? "info" : "error",
 				);
 				return;

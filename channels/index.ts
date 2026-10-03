@@ -15,7 +15,7 @@ export function sendToChannel(
 	timeoutMs: number,
 ): Promise<HttpResult> {
 	if (channel.type !== "ntfy") {
-		return Promise.resolve(localFailure(`未知渠道类型: ${channel.type}`));
+		return Promise.resolve(localFailure(`unknown channel type: ${channel.type}`));
 	}
 	return sendNtfy(channel, payload, timeoutMs);
 }

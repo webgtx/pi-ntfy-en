@@ -96,7 +96,7 @@ export function defaultConfig(path: string): NotifyConfig {
 		maxTextChars: 2000,
 		titleTemplate: "[{{project}}] {{status}} · {{session}}",
 		template:
-			"项目: {{project}}\n会话: {{session}}\n任务: {{task}}\n状态: {{status}}\n原因: {{reason}}\n摘要: {{summary}}\n耗时: {{duration}}\n模型: {{model}}\n主机: {{host}}\n时间: {{date}} {{time}}\n工具: {{tools}}",
+			"Project: {{project}}\nSession: {{session}}\nTask: {{task}}\nStatus: {{status}}\nReason: {{reason}}\nSummary: {{summary}}\nDuration: {{duration}}\nModel: {{model}}\nHost: {{host}}\nTime: {{date}} {{time}}\nTools: {{tools}}",
 		events: { idle: true, interrupted: true, needInput: true, exit: false },
 		// Question-shaped tools block inside their own execute() waiting on the UI,
 		// so agent_settled never fires while they wait — they need their own event.
@@ -114,18 +114,18 @@ export function defaultConfig(path: string): NotifyConfig {
 function normalizeChannels(raw: unknown, warnings: string[]): ChannelConfig[] {
 	if (raw === undefined) return [];
 	if (!Array.isArray(raw)) {
-		warnings.push('"channels" 必须是数组，已忽略');
+		warnings.push('"channels" must be an array; ignored');
 		return [];
 	}
 	const channels: ChannelConfig[] = [];
 	raw.forEach((item, index) => {
 		if (!item || typeof item !== "object") {
-			warnings.push(`channels[${index}] 不是对象，已忽略`);
+			warnings.push(`channels[${index}] is not an object; ignored`);
 			return;
 		}
 		const channel = resolveEnv(item) as NtfyChannel;
 		if (channel.type !== "ntfy") {
-			warnings.push(`channels[${index}] 不是 ntfy 渠道，已忽略`);
+			warnings.push(`channels[${index}] is not an ntfy channel; ignored`);
 			return;
 		}
 		channels.push(channel);
@@ -161,7 +161,7 @@ export function loadConfig(): NotifyConfig {
 	} catch (error) {
 		config.enabled = false;
 		config.warnings.push(
-			`config.json 解析失败：${error instanceof Error ? error.message : String(error)}`,
+			`config.json parse failed: ${error instanceof Error ? error.message : String(error)}`,
 		);
 		cache = { key, config };
 		return config;
@@ -201,12 +201,12 @@ export function loadConfig(): NotifyConfig {
 
 	config.channels = normalizeChannels(parsed.channels, config.warnings);
 	if (config.enabled && config.channels.length === 0) {
-		config.warnings.push("没有配置任何推送渠道");
+		config.warnings.push("no channels configured");
 	} else if (
 		config.enabled &&
 		config.channels.every((c) => c.enabled === false)
 	) {
-		config.warnings.push("所有渠道都是 enabled:false，填好 key 后记得打开");
+		config.warnings.push("all channels are enabled:false — remember to enable them once configured");
 	}
 
 	cache = { key, config };
@@ -280,7 +280,7 @@ export function loadRawConfig(): {
 		return { path, exists: true, data };
 	} catch (error) {
 		throw new Error(
-			`config.json 解析失败：${error instanceof Error ? error.message : String(error)}`,
+			`config.json parse failed: ${error instanceof Error ? error.message : String(error)}`,
 		);
 	}
 }
@@ -305,7 +305,7 @@ export function maskSecret(key: string, value: unknown): string {
 	) {
 		return text;
 	}
-	if (text.length === 0) return "(空)";
+	if (text.length === 0) return "(empty)";
 	if (text.startsWith("$")) return text; // env ref — safe to show
 	if (text.length <= 4) return "****";
 	return `${"*".repeat(Math.min(8, text.length - 4))}${text.slice(-4)}`;
@@ -320,13 +320,13 @@ export function resolveChannelIndex(
 	selector: string,
 ): number {
 	const sel = selector.trim();
-	if (!sel) throw new Error("请指定渠道（type / name / type#N / 序号）");
+	if (!sel) throw new Error("specify a channel (type / name / type#N / index)");
 
 	// pure number → 1-based index
 	if (/^\d+$/.test(sel)) {
 		const idx = Number(sel) - 1;
 		if (idx < 0 || idx >= channels.length) {
-			throw new Error(`渠道序号 ${sel} 超出范围 1..${channels.length || 0}`);
+			throw new Error(`channel index ${sel} out of range 1..${channels.length || 0}`);
 		}
 		return idx;
 	}
@@ -339,9 +339,9 @@ export function resolveChannelIndex(
 		const matches = channels
 			.map((c, i) => ({ c, i }))
 			.filter(({ c }) => String(c.type ?? "").toLowerCase() === type);
-		if (matches.length === 0) throw new Error(`没有 type=${type} 的渠道`);
+		if (matches.length === 0) throw new Error(`no channels with type=${type}`);
 		if (n < 1 || n > matches.length) {
-			throw new Error(`${type} 只有 ${matches.length} 个，无法选 #${n}`);
+			throw new Error(`${type} has only ${matches.length} — cannot select #${n}`);
 		}
 		return matches[n - 1].i;
 	}
@@ -361,11 +361,11 @@ export function resolveChannelIndex(
 	if (byType.length === 1) return byType[0].i;
 	if (byType.length > 1) {
 		throw new Error(
-			`type=${sel} 有 ${byType.length} 个，请用 ${sel}#1 或名称区分`,
+			`type=${sel} has ${byType.length} channels — use ${sel}#1 or a name`,
 		);
 	}
 
-	throw new Error(`找不到渠道 "${sel}"（可用 /push list 查看）`);
+	throw new Error(`channel "${sel}" not found (see /ntfy list)`);
 }
 
 export function formatChannelLabel(
@@ -377,7 +377,7 @@ export function formatChannelLabel(
 		typeof channel.name === "string" && channel.name.trim()
 			? channel.name.trim()
 			: "";
-	const enabled = channel.enabled === false ? "关" : "开";
+	const enabled = channel.enabled === false ? "off" : "on";
 	const base = name ? `${name} (${type}#${index + 1})` : `${type}#${index + 1}`;
 	return `${base} [${enabled}]`;
 }

@@ -45,7 +45,7 @@ export async function sendNtfy(
 	timeoutMs: number,
 ): Promise<HttpResult> {
 	const topic = (channel.topic ?? "").trim();
-	if (!topic) return localFailure("ntfy: topic 为空");
+	if (!topic) return localFailure("ntfy: topic is empty");
 
 	const server = (channel.server ?? DEFAULT_SERVER).trim().replace(/\/+$/, "");
 	const headers: Record<string, string> = {
