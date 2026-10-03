@@ -7,12 +7,12 @@
   "author": "local",
   "repository": {
     "type": "git",
-    "url": "https://git.ipao.vip/rogee/pi-ntfy"
+    "url": "https://github.com/webgtx/pi-ntfy-en"
   },
   "bugs": {
     "url": "https://git.ipao.vip/rogee/pi-ntfy/issues"
   },
-  "homepage": "https://git.ipao.vip/rogee/pi-ntfy",
+  "homepage": "https://github.com/webgtx/pi-ntfy-en",
   "keywords": [
     "pi",
     "pi-coding-agent",
